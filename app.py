@@ -12,20 +12,20 @@ import base64
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE_DIR)
 
-from agents.scanner  import FileScanner
-from agents.parser   import parse_file
+from agents.scanner import FileScanner
+from agents.parser import parse_file
 from agents.embedder import EmbeddingAgent
 from agents.searcher import SemanticSearchAgent
-from agents.master   import MasterAgent, ClaudeMasterAgent, OpenAIMasterAgent, GeminiMasterAgent
+from agents.master import MasterAgent, ClaudeMasterAgent, OpenAIMasterAgent, GeminiMasterAgent
 from utils.vector_db import VectorDB
 
-# ── 경로 상수 ─────────────────────────────────────────────────
-DATA_DIR   = os.path.join(BASE_DIR, "data")
+# 경로 상수
+DATA_DIR = os.path.join(BASE_DIR, "data")
 INDEX_PATH = os.path.join(DATA_DIR, "index",    "faiss.index")
-META_PATH  = os.path.join(DATA_DIR, "index",    "metadata.json")
+META_PATH = os.path.join(DATA_DIR, "index",    "metadata.json")
 STATE_PATH = os.path.join(DATA_DIR, "metadata", "scan_state.json")
 UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
-LOGO_PATH  = os.path.join(BASE_DIR, "assets",   "smu_logo.svg")
+LOGO_PATH = os.path.join(BASE_DIR, "assets",   "smu_logo.svg")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 EMBEDDING_DIM = 768
@@ -53,8 +53,8 @@ def _save_env_key(key: str, value: str):
 from dotenv import load_dotenv
 load_dotenv(ENV_PATH, override=False)
 
-NAVY  = "#1B3A6B"
-BLUE  = "#2563EB"
+NAVY = "#1B3A6B"
+BLUE = "#2563EB"
 LBLUE = "#3B82F6"
 XBLUE = "#EFF6FF"
 
@@ -73,9 +73,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ══════════════════════════════════════════════════════════════
 # CSS
-# ══════════════════════════════════════════════════════════════
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
@@ -354,9 +352,7 @@ footer {{ visibility: hidden; }}
 """, unsafe_allow_html=True)
 
 
-# ══════════════════════════════════════════════════════════════
 # 스플래시 UI  (체크리스트 방식)
-# ══════════════════════════════════════════════════════════════
 _SPLASH_STEPS = [
     "데이터베이스 연결",
     "임베딩 에이전트 준비",
@@ -416,9 +412,7 @@ def _splash_html(current: int) -> str:
     )
 
 
-# ══════════════════════════════════════════════════════════════
 # 에이전트 초기화 (단계별 진행)
-# ══════════════════════════════════════════════════════════════
 _splash = st.empty()
 
 import time
@@ -467,7 +461,7 @@ if "master"     not in st.session_state: st.session_state.master     = None
 if "master_key" not in st.session_state: st.session_state.master_key = None
 
 
-# ── 색인 함수 ─────────────────────────────────────────────────
+# 색인 함수
 def run_indexing(folder_path: str, force: bool = False) -> str:
     folder = os.path.normpath(folder_path)
     if not os.path.isdir(folder):
@@ -520,7 +514,7 @@ def get_master(backend: str, model: str):
     return st.session_state.master
 
 
-# ── 출처 표시 ─────────────────────────────────────────────────
+# 출처 표시
 _EXT_ICONS = {
     "pdf": "📄", "docx": "📝", "doc": "📝",
     "pptx": "📊", "ppt": "📊",
@@ -573,9 +567,7 @@ def show_sources(sources: list):
 </div>""", unsafe_allow_html=True)
 
 
-# ══════════════════════════════════════════════════════════════
 # 사이드바
-# ══════════════════════════════════════════════════════════════
 with st.sidebar:
 
     # ── 로고 헤더 ─────────────────────────────────────────────
@@ -751,11 +743,9 @@ with st.sidebar:
 """, unsafe_allow_html=True)
 
 
-# ══════════════════════════════════════════════════════════════
 # 메인 화면
-# ══════════════════════════════════════════════════════════════
 
-# ── 헤더 ──────────────────────────────────────────────────────
+# 헤더
 logo_html = (
     f'<img src="data:image/svg+xml;base64,{LOGO_B64}" '
     f'style="height:48px;filter:brightness(0) invert(1);margin-right:18px;flex-shrink:0;" />'
@@ -791,7 +781,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# ── DB 비어 있을 때 안내 ──────────────────────────────────────
+# DB 비어 있을 때 안내
 if db.total == 0:
     st.markdown(f"""
 <div style="text-align:center;padding:40px 20px 24px;">
@@ -827,14 +817,14 @@ if db.total == 0:
 
 st.divider()
 
-# ── 채팅 기록 ─────────────────────────────────────────────────
+# 채팅 기록
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
         if msg.get("sources"):
             show_sources(msg["sources"])
 
-# ── 채팅 입력 ─────────────────────────────────────────────────
+# 채팅 입력
 if prompt := st.chat_input("문서 내용에 대해 무엇이든 질문하세요…"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
